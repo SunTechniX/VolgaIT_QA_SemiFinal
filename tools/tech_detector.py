@@ -1,13 +1,11 @@
-# tools/tech_detector.py
 from pathlib import Path
 
 def safe_read_text(path: Path) -> str:
-    """Безопасно читает текстовый файл, игнорируя ошибки кодировки"""
     try:
         return path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         try:
-            return path.read_text(encoding="utf-8-sig")  # для BOM
+            return path.read_text(encoding="utf-8-sig")
         except:
             return path.read_text(encoding="latin1", errors="ignore")
 
@@ -31,7 +29,7 @@ def detect_tech_stack(root: Path):
         reqs = safe_read_text(req_file).lower()
 
     tech = {
-        "imports": imports,
+        "imports": list(imports),  # ← БЫЛО set → СТАЛО list
         "content": content,
         "requirements": reqs,
         "test_framework": "pytest" if "pytest" in content or "pytest" in reqs else "unittest",

@@ -3,14 +3,16 @@ import os
 import json
 import sys
 from pathlib import Path
-from importlib import import_module
+from importlib.util import spec_from_file_location, module_from_spec
 
-sys.path.append(str(Path(__file__).parent))
-
-from structure_analyzer import build_file_tree
-from tech_detector import detect_tech_stack
-from linter_runner import run_linters
-from exec_tester import try_run_tests
+def load_checker(checker_name):
+    checker_path = Path("tools/checkers") / f"{checker_name}.py"
+    if not checker_path.exists():
+        raise FileNotFoundError(f"Checker {checker_name} not found")
+    spec = spec_from_file_location(checker_name, checker_path)
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 def load_criteria():
     with open(".github/criteria.json") as f:
@@ -21,7 +23,7 @@ def evaluate_criteria(criteria, file_tree, tech):
     for crit in criteria:
         checker_name = crit["checker"]
         try:
-            module = import_module(f"tools.checkers.{checker_name}")
+            module = load_checker(checker_name)
             ratio = module.check(file_tree=file_tree, tech=tech)
             score = round(ratio * crit["weight"], 2)
         except Exception as e:
@@ -36,6 +38,13 @@ def evaluate_criteria(criteria, file_tree, tech):
 
 def main():
     root = Path(".")
+    sys.path.insert(0, str(root))  # на всякий случай
+
+    from tools.structure_analyzer import build_file_tree
+    from tools.tech_detector import detect_tech_stack
+    from tools.linter_runner import run_linters
+    from tools.exec_tester import try_run_tests
+
     file_tree = build_file_tree(root)
     tech = detect_tech_stack(root)
     linter_results = run_linters(root)
