@@ -1,4 +1,14 @@
+# tools/structure_analyzer.py
 from pathlib import Path
+
+def safe_read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            return path.read_text(encoding="utf-8-sig")
+        except:
+            return path.read_text(encoding="latin1", errors="ignore")
 
 def build_file_tree(root: Path):
     def _walk(p):
@@ -17,7 +27,7 @@ def build_file_tree(root: Path):
     py_files_content = {}
     for py in root.rglob("*.py"):
         try:
-            py_files_content[str(py)] = py.read_text(encoding="utf-8", errors="ignore")
+            py_files_content[str(py)] = safe_read_text(py)
         except:
             pass
 

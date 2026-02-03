@@ -1,20 +1,34 @@
-def detect_tech_stack(root):
+# tools/tech_detector.py
+from pathlib import Path
+
+def safe_read_text(path: Path) -> str:
+    """Безопасно читает текстовый файл, игнорируя ошибки кодировки"""
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            return path.read_text(encoding="utf-8-sig")  # для BOM
+        except:
+            return path.read_text(encoding="latin1", errors="ignore")
+
+def detect_tech_stack(root: Path):
     imports = set()
     content = ""
     for py in root.rglob("*.py"):
         try:
-            txt = py.read_text(encoding="utf-8", errors="ignore")
+            txt = safe_read_text(py)
             content += txt + "\n"
-            if "import " in txt or "from " in txt:
-                for line in txt.splitlines():
-                    if line.strip().startswith(("import ", "from ")):
-                        imports.add(line.strip())
+            for line in txt.splitlines():
+                stripped = line.strip()
+                if stripped.startswith(("import ", "from ")):
+                    imports.add(stripped)
         except:
             pass
 
     reqs = ""
-    if (root / "requirements.txt").exists():
-        reqs = (root / "requirements.txt").read_text().lower()
+    req_file = root / "requirements.txt"
+    if req_file.exists():
+        reqs = safe_read_text(req_file).lower()
 
     tech = {
         "imports": imports,
@@ -25,9 +39,9 @@ def detect_tech_stack(root):
         "allure": "allure" in content or "allure" in reqs
     }
 
-    if "from selenium" in content or "import selenium" in content or "selenium" in reqs:
+    if "selenium" in content or "selenium" in reqs:
         tech["driver"] = "Selenium"
-    elif "from playwright" in content or "playwright" in reqs:
+    elif "playwright" in content or "playwright" in reqs:
         tech["driver"] = "Playwright"
 
     return tech
