@@ -1,7 +1,29 @@
 # tools/checkers/allure_metadata.py
 import ast
 
-def check(file_tree, tech, **kwargs):
+def _get_decorator_name(node):
+    """Рекурсивно получает полное имя декоратора: allure.feature → 'allure.feature'"""
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        parts = []
+        cur = node
+        while isinstance(cur, ast.Attribute):
+            parts.append(cur.attr)
+            cur = cur.value
+        if isinstance(cur, ast.Name):
+            parts.append(cur.id)
+        return ".".join(reversed(parts))
+    elif isinstance(node, ast.Call):
+        return _get_decorator_name(node.func)
+    return ""
+
+def check(file_tree, tech, **kwargs) -> float:
+    """
+    Оценивает покрытие тестовых функций метаданными Allure:
+    - Учитываются @allure.feature, @story, @severity, @epic
+    - Не учитываются @allure.step и просто @allure
+    """
     py_content = file_tree.get("py_files_content", {})
     total_tests = 0
     tests_with_meta = 0
@@ -18,28 +40,13 @@ def check(file_tree, tech, **kwargs):
                 has_meta = False
                 for deco in node.decorator_list:
                     name = _get_decorator_name(deco)
-                    if name.startswith("allure.") and name != "allure.step":
+                    # Считаем всё, что начинается с allure., кроме step
+                    if name.startswith("allure.") and name not in ("allure.step", "allure"):
                         has_meta = True
                         break
                 if has_meta:
                     tests_with_meta += 1
 
     if total_tests == 0:
-        return 1.0
+        return 1.0  # нет тестов → критерий не применим → полный балл
     return min(1.0, tests_with_meta / total_tests)
-
-def _get_decorator_name(deco):
-    if isinstance(deco, ast.Name):
-        return deco.id
-    elif isinstance(deco, ast.Attribute):
-        parts = []
-        cur = deco
-        while isinstance(cur, ast.Attribute):
-            parts.append(cur.attr)
-            cur = cur.value
-        if isinstance(cur, ast.Name):
-            parts.append(cur.id)
-        return ".".join(reversed(parts))
-    elif isinstance(deco, ast.Call):
-        return _get_decorator_name(deco.func)
-    return ""
