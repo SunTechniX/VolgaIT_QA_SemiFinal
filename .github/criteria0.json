@@ -1,0 +1,70 @@
+{
+  "criteria": [
+    {
+      "id": "selen-drv",
+      "name": "Использован Selenium WebDriver",
+      "weight": 1.0,
+      "checker": "selenium_used"
+    },
+    {
+      "id": "playwright-used",
+      "name": "Использован Playwright",
+      "weight": 1.0,
+      "checker": "playwright_used"
+    },
+    {
+      "id": "selector",
+      "name": "Использованы CSS/XPath/ID селекторы",
+      "weight": 1.0,
+      "checker": "good_locators"
+    },
+    {
+      "id": "git",
+      "name": "Проект на GitHub (MR в master)",
+      "weight": 0.5,
+      "checker": "git_present"
+    },
+    {
+      "id": "POM",
+      "name": "Использован Page Object",
+      "weight": 1.0,
+      "checker": "has_pom"
+    },
+    {
+      "id": "screen-shots",
+      "name": "Скриншоты при падении",
+      "weight": 0.7,
+      "checker": "has_screenshots"
+    },
+    {
+      "id": "allure",
+      "name": "Используется Allure (step/epic/story)",
+      "weight": 1.2,
+      "checker": "has_allure"
+    },
+    {
+      "id": "files",
+      "name": "Корректный .gitignore",
+      "weight": 0.5,
+      "checker": "gitignore_ok"
+    },
+    {
+      "id": "struct",
+      "name": "Чёткая структура: pages/, tests/, utils/",
+      "weight": 1.0,
+      "checker": "has_structure"
+    },
+    {
+      "id": "wait-in-class",
+      "name": "Ожидания вынесены в отдельный класс",
+      "weight": 0.8,
+      "checker": "wait_utils"
+    },
+    {
+      "id": "parallel",
+      "name": "Поддержка параллельного запуска",
+      "weight": 0.7,
+      "checker": "parallel_ready"
+    }
+  ]
+}
