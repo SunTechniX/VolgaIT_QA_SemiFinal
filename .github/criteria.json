@@ -31,10 +31,16 @@
       "checker": "has_screenshots"
     },
     {
-      "id": "allure",
-      "name": "Используется Allure (step/epic/story)",
-      "weight": 1.2,
-      "checker": "has_allure"
+      "id": "allure-metadata",
+      "name": "Allure: метаданные тестов (@feature, @story и др.)",
+      "weight": 1.0,
+      "checker": "allure_metadata"
+    },
+    {
+      "id": "allure-steps",
+      "name": "Allure: использование шагов (@step и with step)",
+      "weight": 0.8,
+      "checker": "allure_steps"
     },
     {
       "id": "files",
