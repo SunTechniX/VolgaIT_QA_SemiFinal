@@ -43,7 +43,8 @@ def main():
         status = "✅" if score >= max_s * 0.9 else ("⚠️" if score > 0 else "❌")
         lines.append(f"| `{cid}`<br>{info['name']} | {score} | {max_s} | {status} |")
     s = data["summary"]
-    lines.append(f"\n**Итого**: {s['total']} / {s['max']} ({s['percent']}%)")
+    lines.append(f"| **ИТОГО** | **{s['total']}** | **{s['max']}** | **{s['percent']}%** |")
+    # lines.append(f"\n**Итого**: {s['total']} / {s['max']} ({s['percent']}%)")
 
     # Линтеры
     lint = data["linters"]

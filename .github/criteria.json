@@ -1,16 +1,10 @@
 {
   "criteria": [
     {
-      "id": "selen-drv",
-      "name": "Использован Selenium WebDriver",
+      "id": "webdriver",
+      "name": "Использован WebDriver (Selenium или Playwright)",
       "weight": 1.0,
-      "checker": "selenium_used"
-    },
-    {
-      "id": "playwright-used",
-      "name": "Использован Playwright",
-      "weight": 1.0,
-      "checker": "playwright_used"
+      "checker": "webdriver_used"
     },
     {
       "id": "selector",
